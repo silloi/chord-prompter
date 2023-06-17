@@ -89,11 +89,6 @@ ${key ? 'key: ' + key : ''}`
 
 <section>
 	<h1>ChordPrompter</h1>
-	<!-- <ul>
-		{#each $messages as message}
-			<li>{message.role}: {message.content}</li>
-		{/each}
-	</ul> -->
 	<div style="padding: 12px;">
 		<h2>{theme}</h2>
 	</div>
@@ -107,8 +102,8 @@ ${key ? 'key: ' + key : ''}`
 	<div class="degree-group">
 		{#each chordProgression as chord}
 			<div class="degree-box">
-				<!-- <span>{chord && chord.tonality}</span>
-        <span>{chord && chord.chordType}</span> -->
+				<span>{chord && chord.tonality ? chord.tonality : '...'}</span>
+				<span>{chord && chord.chordType ? chord.chordType : '...'}</span>
 				<span class="degree-name">{chord && chord.scaleDegree ? chord.scaleDegree : '...'}</span>
 			</div>
 		{/each}
@@ -154,8 +149,8 @@ ${key ? 'key: ' + key : ''}`
 
 	h2 {
 		margin-top: 0;
-		height: 2rem;
-		font-size: 2rem;
+		height: 1.5rem;
+		font-size: 1.5rem;
 		text-decoration: underline;
 	}
 

@@ -7,10 +7,9 @@
 	const { input, handleSubmit, messages } = useChat();
 
 	let genre = 'City Pop';
-	let mood = '80s';
-	let key = '';
+	let mood = '80s Japan';
 
-	const generateThemeString = (genre?: string, mood?: string, key?: string) => {
+	const generateThemeString = (genre?: string, mood?: string) => {
 		let titleList = new Array<string>();
 
 		if (mood) {
@@ -21,62 +20,87 @@
 			titleList = [...titleList, genre];
 		}
 
-		if (key) {
-			titleList = [...titleList, `in ${key}`];
-		}
-
 		return titleList.join(' ') ?? 'Free Style';
 	};
 
-	$: theme = generateThemeString(genre, mood, key);
+	$: theme = generateThemeString(genre, mood);
 
 	// let chordProgression: any[] = [];
 	let chordProgression = [
 		{
-			chord: 'G',
-			tonality: 'major',
-			chordType: 'triad',
+			chordSymbol: 'Cmaj7',
 			scaleDegree: 'I'
 		},
 		{
-			chord: 'Em7',
-			tonality: 'minor',
-			chordType: 'seventh',
-			scaleDegree: 'iii'
-		},
-		{
-			chord: 'Am7',
-			tonality: 'minor',
-			chordType: 'seventh',
+			chordSymbol: 'Am7',
 			scaleDegree: 'vi'
 		},
 		{
-			chord: 'D7',
-			tonality: 'major',
-			chordType: 'seventh',
+			chordSymbol: 'Fmaj7',
 			scaleDegree: 'IV'
+		},
+		{
+			chordSymbol: 'G7',
+			scaleDegree: 'V'
+		},
+		{
+			chordSymbol: 'Cmaj7',
+			scaleDegree: 'I'
+		},
+		{
+			chordSymbol: 'Am7',
+			scaleDegree: 'vi'
+		},
+		{
+			chordSymbol: 'Fmaj7',
+			scaleDegree: 'IV'
+		},
+		{
+			chordSymbol: 'G7',
+			scaleDegree: 'V'
 		}
 	];
+	let title = 'Neon Lights';
+	let description = 'A nostalgic city pop track inspired by the vibrant nightlife of 80s Japan.';
+	let analysis =
+		'The chord progression for "Neon Lights" follows a classic city pop structure, reminiscent of the music scene in 80s Japan. The song starts with a dreamy Cmaj7 chord as the tonic (I) and progresses to Am7, Fmaj7, and G7, creating a smooth and nostalgic atmosphere. The repetition of the chord progression provides a sense of familiarity, while the G7 chord leading back to Cmaj7 adds a subtle tension and resolution. Overall, "Neon Lights" captures the essence of 80s city pop, drawing listeners into a nostalgic journey through neon-lit streets.';
 
 	$: {
 		input.update(
 			() => `You are a music composing assistant.
-Generate a chord progression in yaml that starts with "chordProgression:".
-Each chord has properties for chord, tonality, chordType, and scaleDegree.
-Here are my requests.
+Generate a chord progression in yaml that contains "chordProgression" list.
+Each chord has properties for chordSymbol (e.g. A7) and scaleDegree (e.g. iii).
+The length of bars should be 8.
+Finally, describe the song in "title" and "description".
+Analyze the chord progression in "analysis", too.
+Here are my requests:
 ${genre ? 'genre: ' + genre : ''}
 ${mood ? 'mood: ' + mood : ''}
-${key ? 'key: ' + key : ''}`
+`
 		);
 	}
 
 	$: {
 		try {
 			if ($messages.slice(-1)[0]) {
-				const res = load($messages.slice(-1)[0].content) as { chordProgression: any[] };
-				console.log(res);
-				if ('chordProgression' in res && res.chordProgression.length) {
-					chordProgression = res.chordProgression;
+				const result = load($messages.slice(-1)[0].content) as {
+					chordProgression: any[];
+					title: string;
+					description: string;
+					analysis: string;
+				};
+				console.log(result);
+				if ('chordProgression' in result && result.chordProgression.length) {
+					chordProgression = result.chordProgression;
+				}
+				if ('title' in result && result.title) {
+					title = result.title;
+				}
+				if ('description' in result && result.description) {
+					description = result.description;
+				}
+				if ('analysis' in result && result.analysis) {
+					analysis = result.analysis;
 				}
 			}
 		} catch (err) {}
@@ -93,13 +117,13 @@ ${key ? 'key: ' + key : ''}`
 
 	const playChordProgression = (chordProgression: any[]) => {
 		chordProgression.forEach((chord, barIndex) => {
-			const notes = Chord.get(chord.chord).notes;
+			const notes = Chord.get(chord.chordSymbol).notes;
 			const synth = new Tone.PolySynth(Tone.Synth).toDestination();
 
 			const now = Tone.now();
 
 			notes.forEach((note) => {
-				synth.triggerAttackRelease(note + '4', 2, now + barIndex * 2);
+				synth.triggerAttackRelease(note + '4', 1.5, now + barIndex * 2);
 			});
 		});
 	};
@@ -113,26 +137,26 @@ ${key ? 'key: ' + key : ''}`
 
 <section>
 	<h1>ChordPrompter</h1>
-	<div style="padding: 12px;">
-		<h2>{theme}</h2>
+	<div class="summary">
+		<h2>{title}</h2>
+		<p>{description}</p>
 	</div>
 	<div class="chord-group">
 		{#each chordProgression as chord}
-			<button class="chord-box" on:click={() => chord && playChord(chord.chord)}>
-				<div class="chord-name">{chord && chord.chord ? chord.chord : '...'}</div>
+			<button class="chord-box" on:click={() => chord && playChord(chord.chordSymbol)}>
+				<span class="chord-name">{chord && chord.chordSymbol ? chord.chordSymbol : '...'}</span>
 			</button>
 		{/each}
 	</div>
 	<div class="degree-group">
 		{#each chordProgression as chord}
 			<div class="degree-box">
-				<span>{chord && chord.tonality ? chord.tonality : '...'}</span>
-				<span>{chord && chord.chordType ? chord.chordType : '...'}</span>
 				<span class="degree-name">{chord && chord.scaleDegree ? chord.scaleDegree : '...'}</span>
 			</div>
 		{/each}
 	</div>
 	<button on:click={() => playChordProgression(chordProgression)}>Play Chords</button>
+	<p>{analysis}</p>
 	<form on:submit={handleSubmit}>
 		<div class="input-group">
 			<div class="input-box">
@@ -143,11 +167,6 @@ ${key ? 'key: ' + key : ''}`
 			<div class="input-box">
 				<label for="mood">Mood</label>
 				<input bind:value={mood} name="mood" placeholder="Urban" />
-			</div>
-
-			<div class="input-box">
-				<label for="key">Key</label>
-				<input bind:value={key} placeholder="G" />
 			</div>
 		</div>
 
@@ -172,6 +191,13 @@ ${key ? 'key: ' + key : ''}`
 		width: 100%;
 	}
 
+	.summary {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: 12px;
+	}
+
 	h2 {
 		margin-top: 0;
 		height: 1.5rem;
@@ -191,17 +217,17 @@ ${key ? 'key: ' + key : ''}`
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		border: solid 0.5rem gray;
+		border-radius: 1rem;
+		box-sizing: border-box;
+		background-color: white;
 	}
 
 	.chord-name {
 		display: flex;
 		justify-content: center;
-		font-size: 2.5rem;
-		border: solid 0.5rem gray;
-		border-radius: 1rem;
-		box-sizing: border-box;
+		font-size: 2rem;
 		width: 100%;
-		background-color: white;
 	}
 
 	.degree-box {

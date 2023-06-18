@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { useChat } from 'ai/svelte';
 	import { load } from 'js-yaml';
+	import { Chord } from 'tonal';
+	import * as Tone from 'tone';
 
 	const { input, handleSubmit, messages } = useChat();
 
@@ -71,7 +73,7 @@ ${key ? 'key: ' + key : ''}`
 	$: {
 		try {
 			if ($messages.slice(-1)[0]) {
-				const res = load($messages.slice(-1)[0].content);
+				const res = load($messages.slice(-1)[0].content) as { chordProgression: any[] };
 				console.log(res);
 				if ('chordProgression' in res && res.chordProgression.length) {
 					chordProgression = res.chordProgression;
@@ -79,6 +81,28 @@ ${key ? 'key: ' + key : ''}`
 			}
 		} catch (err) {}
 	}
+
+	const playChord = (chordSymbol: string) => {
+		const notes = Chord.get(chordSymbol).notes;
+		const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+
+		notes.forEach((note) => {
+			synth.triggerAttackRelease(note + '4', 1);
+		});
+	};
+
+	const playChordProgression = (chordProgression: any[]) => {
+		chordProgression.forEach((chord, barIndex) => {
+			const notes = Chord.get(chord.chord).notes;
+			const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+
+			const now = Tone.now();
+
+			notes.forEach((note) => {
+				synth.triggerAttackRelease(note + '4', 2, now + barIndex * 2);
+			});
+		});
+	};
 </script>
 
 <svelte:head>
@@ -94,9 +118,9 @@ ${key ? 'key: ' + key : ''}`
 	</div>
 	<div class="chord-group">
 		{#each chordProgression as chord}
-			<div class="chord-box">
+			<button class="chord-box" on:click={() => chord && playChord(chord.chord)}>
 				<div class="chord-name">{chord && chord.chord ? chord.chord : '...'}</div>
-			</div>
+			</button>
 		{/each}
 	</div>
 	<div class="degree-group">
@@ -108,6 +132,7 @@ ${key ? 'key: ' + key : ''}`
 			</div>
 		{/each}
 	</div>
+	<button on:click={() => playChordProgression(chordProgression)}>Play Chords</button>
 	<form on:submit={handleSubmit}>
 		<div class="input-group">
 			<div class="input-box">

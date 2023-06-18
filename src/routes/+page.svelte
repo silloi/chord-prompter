@@ -156,7 +156,10 @@ ${mood ? 'mood: ' + mood : ''}
 		{/each}
 	</div>
 	<button on:click={() => playChordProgression(chordProgression)}>Play Chords</button>
-	<p>{analysis}</p>
+	<details class="analysis">
+		<summary>Analysis</summary>
+		<p>{analysis}</p>
+	</details>
 	<form on:submit={handleSubmit}>
 		<div class="input-group">
 			<div class="input-box">
@@ -241,6 +244,10 @@ ${mood ? 'mood: ' + mood : ''}
 
 	.degree-name {
 		font-size: 1.5rem;
+	}
+
+	.analysis {
+		width: 100%;
 	}
 
 	.input-group {

@@ -209,6 +209,7 @@ ${mood ? 'mood: ' + mood : ''}
 	.degree-group {
 		display: flex;
 		width: 100%;
+		overflow-x: auto;
 	}
 
 	.chord-box {

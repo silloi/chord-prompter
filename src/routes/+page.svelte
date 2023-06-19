@@ -4,6 +4,12 @@
 	import { Chord } from 'tonal';
 	import * as Tone from 'tone';
 
+	import Button from '@specialdoom/proi-ui/Button.svelte';
+
+	import Analysis from '../components/Analysis.svelte';
+	import Summary from '../components/Summary.svelte';
+	import TextInput from '../components/TextInput.svelte';
+
 	const { input, handleSubmit, messages } = useChat();
 
 	let genre = 'City Pop';
@@ -137,10 +143,7 @@ ${mood ? 'mood: ' + mood : ''}
 
 <section>
 	<h1>ChordPrompter</h1>
-	<div class="summary">
-		<h2>{title}</h2>
-		<p>{description}</p>
-	</div>
+	<Summary {title} {description} />
 	<div class="chord-group">
 		{#each chordProgression as chord}
 			<button class="chord-box" on:click={() => chord && playChord(chord.chordSymbol)}>
@@ -155,26 +158,15 @@ ${mood ? 'mood: ' + mood : ''}
 			</div>
 		{/each}
 	</div>
-	<button on:click={() => playChordProgression(chordProgression)}>Play Chords</button>
-	<details class="analysis">
-		<summary>Analysis</summary>
-		<p>{analysis}</p>
-	</details>
+	<Analysis {analysis} />
+	<Button on:click={() => playChordProgression(chordProgression)}>Play Chords</Button>
 	<form on:submit={handleSubmit}>
 		<div class="input-group">
-			<div class="input-box">
-				<label for="genre">Genre</label>
-				<input bind:value={genre} name="genre" placeholder="City Pop" />
-			</div>
-
-			<div class="input-box">
-				<label for="mood">Mood</label>
-				<input bind:value={mood} name="mood" placeholder="Urban" />
-			</div>
+			<TextInput bind:value={genre} label="Genre" placeholder="City Pop" />
+			<TextInput bind:value={mood} label="Mood" placeholder="80s Japan" />
 		</div>
-
 		<div class="submit-box">
-			<button type="submit">Generate Chords!</button>
+			<Button>Generate Chords!</Button>
 		</div>
 	</form>
 </section>
@@ -192,20 +184,6 @@ ${mood ? 'mood: ' + mood : ''}
 		text-shadow: 4px 4px 4px #aaa;
 		font-size: 5rem;
 		width: 100%;
-	}
-
-	.summary {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		padding: 12px;
-	}
-
-	h2 {
-		margin-top: 0;
-		height: 1.5rem;
-		font-size: 1.5rem;
-		text-decoration: underline;
 	}
 
 	.chord-group,
@@ -246,18 +224,9 @@ ${mood ? 'mood: ' + mood : ''}
 		font-size: 1.5rem;
 	}
 
-	.analysis {
-		width: 100%;
-	}
-
 	.input-group {
 		width: 300px;
 		padding: 24px;
-	}
-
-	.input-box {
-		display: flex;
-		justify-content: space-between;
 	}
 
 	.submit-box {

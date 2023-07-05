@@ -6,7 +6,6 @@
 
 	import Button from '@specialdoom/proi-ui/Button.svelte';
 
-	import Analysis from '../components/Analysis.svelte';
 	import Summary from '../components/Summary.svelte';
 	import TextInput from '../components/TextInput.svelte';
 

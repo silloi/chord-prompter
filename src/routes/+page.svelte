@@ -143,7 +143,7 @@ ${mood ? 'mood: ' + mood : ''}
 
 <section>
 	<h1>ChordPrompter</h1>
-	<Summary {title} {description} />
+	<Summary {title} {description} {analysis} />
 	<div class="chord-group">
 		{#each chordProgression as chord}
 			<button class="chord-box" on:click={() => chord && playChord(chord.chordSymbol)}>
@@ -158,7 +158,6 @@ ${mood ? 'mood: ' + mood : ''}
 			</div>
 		{/each}
 	</div>
-	<Analysis {analysis} />
 	<Button on:click={() => playChordProgression(chordProgression)}>Play Chords</Button>
 	<form on:submit={handleSubmit}>
 		<div class="input-group">

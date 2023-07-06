@@ -14,61 +14,42 @@
 	let genre = 'City Pop';
 	let mood = '80s Japan';
 
-	const generateThemeString = (genre?: string, mood?: string) => {
-		let titleList = new Array<string>();
+	let result = `---
+genre: City Pop
+mood: 80s Japan
+chordProgression: 
+  - chordSymbol: Dmaj7
+    scaleDegree: I
+  - chordSymbol: F#m7
+    scaleDegree: iii
+  - chordSymbol: Bm7
+    scaleDegree: vi
+  - chordSymbol: Emaj7
+    scaleDegree: II
+  - chordSymbol: G#m7
+    scaleDegree: IV
+  - chordSymbol: C#m7
+    scaleDegree: vii
+  - chordSymbol: F#7
+    scaleDegree: iii7
+  - chordSymbol: Bmaj7
+    scaleDegree: VI
+title: Neon Lights
+description: A nostalgic and vibrant City Pop song inspired by the 80s Japan music scene. The catchy melodies and energetic rhythms will transport you to the neon-lit streets of Tokyo, evoking a sense of longing and excitement.
+analysis: The chord progression starts with a bright and uplifting Dmaj7 (I) chord, setting the nostalgic tone for the song. The progression then moves to F#m7 (iii) and Bm7 (vi), adding a touch of melancholy. The Emaj7 (II) chord brings a sense of anticipation and leads smoothly to G#m7 (IV) and C#m7 (vii), creating tension and depth. The progression resolves with F#7 (iii7) and finally lands on Bmaj7 (VI), providing a satisfying conclusion. Overall, the chord progression captures the essence of City Pop with its blend of major and minor chords, creating a nostalgic yet vibrant atmosphere.
+`;
 
-		if (mood) {
-			titleList = [...titleList, mood];
-		}
-
-		if (genre) {
-			titleList = [...titleList, genre];
-		}
-
-		return titleList.join(' ') ?? 'Free Style';
+	let parsed = {
+		chordProgression: new Array<{ chordSymbol: string; scaleDegree: string }>(),
+		title: '',
+		description: '',
+		analysis: ''
 	};
 
-	$: theme = generateThemeString(genre, mood);
-
-	// let chordProgression: any[] = [];
-	let chordProgression = [
-		{
-			chordSymbol: 'Cmaj7',
-			scaleDegree: 'I'
-		},
-		{
-			chordSymbol: 'Am7',
-			scaleDegree: 'vi'
-		},
-		{
-			chordSymbol: 'Fmaj7',
-			scaleDegree: 'IV'
-		},
-		{
-			chordSymbol: 'G7',
-			scaleDegree: 'V'
-		},
-		{
-			chordSymbol: 'Cmaj7',
-			scaleDegree: 'I'
-		},
-		{
-			chordSymbol: 'Am7',
-			scaleDegree: 'vi'
-		},
-		{
-			chordSymbol: 'Fmaj7',
-			scaleDegree: 'IV'
-		},
-		{
-			chordSymbol: 'G7',
-			scaleDegree: 'V'
-		}
-	];
-	let title = 'Neon Lights';
-	let description = 'A nostalgic city pop track inspired by the vibrant nightlife of 80s Japan.';
-	let analysis =
-		'The chord progression for "Neon Lights" follows a classic city pop structure, reminiscent of the music scene in 80s Japan. The song starts with a dreamy Cmaj7 chord as the tonic (I) and progresses to Am7, Fmaj7, and G7, creating a smooth and nostalgic atmosphere. The repetition of the chord progression provides a sense of familiarity, while the G7 chord leading back to Cmaj7 adds a subtle tension and resolution. Overall, "Neon Lights" captures the essence of 80s city pop, drawing listeners into a nostalgic journey through neon-lit streets.';
+	let chordProgression = new Array<{ chordSymbol: string; scaleDegree: string }>();
+	let title = '';
+	let description = '';
+	let analysis = '';
 
 	$: {
 		input.update(
@@ -87,26 +68,36 @@ ${mood ? 'mood: ' + mood : ''}
 
 	$: {
 		try {
-			if ($messages.slice(-1)[0]) {
-				const result = load($messages.slice(-1)[0].content) as {
-					chordProgression: any[];
-					title: string;
-					description: string;
-					analysis: string;
-				};
-				console.log(result);
-				if ('chordProgression' in result && result.chordProgression.length) {
-					chordProgression = result.chordProgression;
-				}
-				if ('title' in result && result.title) {
-					title = result.title;
-				}
-				if ('description' in result && result.description) {
-					description = result.description;
-				}
-				if ('analysis' in result && result.analysis) {
-					analysis = result.analysis;
-				}
+			if ($messages.length % 2 === 0 && $messages.slice(-1)[0]) {
+				result = $messages.slice(-1)[0].content;
+			}
+		} catch (err) {}
+	}
+
+	$: {
+		try {
+			parsed = load(result) as {
+				chordProgression: any[];
+				title: string;
+				description: string;
+				analysis: string;
+			};
+		} catch (err) {}
+	}
+
+	$: {
+		try {
+			if ('chordProgression' in parsed && parsed.chordProgression.length) {
+				chordProgression = parsed.chordProgression;
+			}
+			if ('title' in parsed && parsed.title) {
+				title = parsed.title;
+			}
+			if ('description' in parsed && parsed.description) {
+				description = parsed.description;
+			}
+			if ('analysis' in parsed && parsed.analysis) {
+				analysis = parsed.analysis;
 			}
 		} catch (err) {}
 	}

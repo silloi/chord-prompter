@@ -14,10 +14,7 @@
 	let genre = 'City Pop';
 	let mood = '80s Japan';
 
-	let result = `---
-genre: City Pop
-mood: 80s Japan
-chordProgression: 
+	let result = `chordProgression: 
   - chordSymbol: Dmaj7
     scaleDegree: I
   - chordSymbol: F#m7
@@ -34,10 +31,19 @@ chordProgression:
     scaleDegree: iii7
   - chordSymbol: Bmaj7
     scaleDegree: VI
+
 title: Neon Lights
 description: A nostalgic and vibrant City Pop song inspired by the 80s Japan music scene. The catchy melodies and energetic rhythms will transport you to the neon-lit streets of Tokyo, evoking a sense of longing and excitement.
+
 analysis: The chord progression starts with a bright and uplifting Dmaj7 (I) chord, setting the nostalgic tone for the song. The progression then moves to F#m7 (iii) and Bm7 (vi), adding a touch of melancholy. The Emaj7 (II) chord brings a sense of anticipation and leads smoothly to G#m7 (IV) and C#m7 (vii), creating tension and depth. The progression resolves with F#7 (iii7) and finally lands on Bmaj7 (VI), providing a satisfying conclusion. Overall, the chord progression captures the essence of City Pop with its blend of major and minor chords, creating a nostalgic yet vibrant atmosphere.
-`;
+
+references:
+  - Tatsuro Yamashita - "Ride on Time"
+  - Mariya Takeuchi - "Plastic Love"
+
+genre: City Pop
+mood: 80s Japan
+bars: 8`;
 
 	let parsed = {
 		chordProgression: new Array<{ chordSymbol: string; scaleDegree: string }>(),
@@ -53,15 +59,19 @@ analysis: The chord progression starts with a bright and uplifting Dmaj7 (I) cho
 
 	$: {
 		input.update(
-			() => `You are a music composing assistant.
-Generate a chord progression in yaml that contains "chordProgression" list.
-Each chord has properties for chordSymbol (e.g. A7) and scaleDegree (e.g. iii).
-The length of bars should be 8.
-Finally, describe the song in "title" and "description".
-Analyze the chord progression in "analysis", too.
-Here are my requests:
-${genre ? 'genre: ' + genre : ''}
-${mood ? 'mood: ' + mood : ''}
+			() => `---
+system:
+  - You are a music composing assistant.
+  - Generate a YAML script that starts with "chordProgression" list.
+  - Each chord has properties for "chordSymbol" (e.g. A7) and "scaleDegree" (e.g. iii).
+  - Describe the song in catchy "title" and concise "description".
+  - Analyze the chord progression in "analysis".
+	- If there are some referencial songs, add "references" list (e.g. John Doe - Foo Bar).
+	- Follow user requests below.
+requests:
+  - ${genre ? 'genre: ' + genre : ''}
+  - ${mood ? 'mood: ' + mood : ''}
+	- bars: 8
 `
 		);
 	}
